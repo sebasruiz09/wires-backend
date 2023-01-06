@@ -1,6 +1,6 @@
 export interface IResponse {
   access_token: string;
-  expires_in: any;
+  expires_in: string;
   message: string;
-  ok: boolean;
+  status: boolean;
 }

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from 'src/database';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -8,6 +12,8 @@ import { LoginDto, RegisterDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { IPayload } from './interfaces';
+import { equals } from 'class-validator';
+import { IResponse } from './interfaces/response.interface';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +41,7 @@ export class AuthService {
   ): Promise<User> {
     const user = await this.userExists(username, email);
     if (!user) throw new UnauthorizedException(`User ${user} was not found`);
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await this.comparePassword(password, user);
     if (!isPasswordValid) throw new UnauthorizedException('Invalid password');
 
     return user;
@@ -49,40 +55,64 @@ export class AuthService {
     return await this.jwtService.verify(token);
   }
 
-  async createJwt(user: User) {
+  async createJwt(user: User): Promise<IResponse> {
     const payload: IPayload = { username: user.username, userId: user.id };
     return {
       access_token: this.jwtService.sign(payload),
       expires_in: this.configService.get('JWT_EXPIRES_IN'),
       message: 'Successfully logged in',
-      ok: true,
+      status: true,
     };
   }
 
-  async login(user: LoginDto) {
+  async login(user: LoginDto): Promise<IResponse> {
     const { username, password } = user;
     const userValidated = await this.validateUser(username, password);
 
     return await this.createJwt(userValidated);
   }
 
-  async register(user: RegisterDto) {
-    const { username, email, fullName } = user;
+  async register(user: RegisterDto): Promise<User> {
+    const { username, email, fullname } = user;
     const userExists = await this.userExists(username, email);
-    if (userExists) throw new UnauthorizedException('User already exists');
+    if (!userExists) {
+      const password = await this.hashPassword(user.password);
+      try {
+        const newUser = this.userRepository.create({
+          id: uuidv4(),
+          username,
+          email,
+          fullname,
+          password,
+        });
+        const response = await this.userRepository.save(newUser);
+        return this.genResponse(response);
+      } catch (error) {
+        throw new BadRequestException();
+      }
+    }
+    throw new BadRequestException('User already exists');
+  }
 
-    const password = await bcrypt.hash(user.password, 10);
-    const newUser = this.userRepository.create({
-      id: uuidv4(),
-      username,
-      email,
-      fullName,
-      password,
+  private async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10);
+  }
+
+  private async comparePassword(
+    password: string,
+    user: User,
+  ): Promise<boolean> {
+    return await bcrypt.compare(password, user.password);
+  }
+
+  private genResponse(response: User): User {
+    ['password', 'createdAt', 'updatedAt'].map((item) => {
+      Object.keys(response).map((key) => {
+        if (equals(key, item)) {
+          delete response[key];
+        }
+      });
     });
-    await this.userRepository.save(newUser);
-    return {
-      message: 'User created successfully',
-      ok: true,
-    };
+    return response;
   }
 }

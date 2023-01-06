@@ -35,7 +35,7 @@ export class User extends BaseEntity {
     type: 'varchar',
     nullable: false,
   })
-  fullName: string;
+  fullname: string;
 
   @Column({
     name: 'password',

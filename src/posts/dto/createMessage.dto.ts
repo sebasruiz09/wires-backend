@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length, MinLength } from 'class-validator';
 
-export class CreatePostDto {
+export class CreateMessageDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(5)

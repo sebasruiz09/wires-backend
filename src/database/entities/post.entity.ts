@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from './';
 
-@Entity()
+@Entity({ name: 'post' })
 export class Post extends BaseEntity {
   @PrimaryGeneratedColumn({
     type: 'bigint',
@@ -41,11 +41,13 @@ export class Post extends BaseEntity {
 
   @CreateDateColumn({
     name: 'created_at',
+    type: 'timestamptz',
   })
   createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
+    type: 'timestamptz',
   })
   updatedAt: Date;
 }

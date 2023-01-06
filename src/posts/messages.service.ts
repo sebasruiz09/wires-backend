@@ -2,14 +2,16 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Res,
 } from '@nestjs/common';
 import { CreatePostDto } from './dto';
 import { Post } from 'src/database';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { equals } from 'class-validator';
 
 @Injectable()
-export class PostsService {
+export class MessagesService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
@@ -52,25 +54,6 @@ export class PostsService {
   async findAll(): Promise<Post[]> {
     return await this.postRepository.find();
   }
-
-  // async update(id: number, { content, title, userId }: UpdatePostDto) {
-  //   const { post } = await this.findOne(id);
-
-  //   if (post.user.id !== userId)
-  //     throw new NotFoundException('Message not found');
-  //   await this.postRepository.update(id, {
-  //     text: content,
-  //     title,
-  //   });
-  //   return {
-  //     message: 'Post updated successfully',
-  //     post: {
-  //       ...post,
-  //       text: content,
-  //       title,
-  //     },
-  //   };
-  // }
 
   async remove(id: number) {
     const { post } = await this.findOne(id);
