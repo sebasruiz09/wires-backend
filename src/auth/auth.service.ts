@@ -88,7 +88,8 @@ export class AuthService {
         const response = await this.userRepository.save(newUser);
         return this.genResponse(response);
       } catch (error) {
-        throw new BadRequestException();
+        console.log(error);
+        throw new BadRequestException(`${error.driverError.detail}`);
       }
     }
     throw new BadRequestException('User already exists');

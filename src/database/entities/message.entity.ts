@@ -7,10 +7,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
 } from 'typeorm';
-import { User } from './';
+import { User } from '.';
 
-@Entity({ name: 'post' })
-export class Post extends BaseEntity {
+@Entity({ name: 'message' })
+export class Message extends BaseEntity {
   @PrimaryGeneratedColumn({
     type: 'bigint',
   })
@@ -19,12 +19,9 @@ export class Post extends BaseEntity {
   @ManyToOne(() => User, (user) => user.id, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
+    eager: true,
   })
-  @Column({
-    type: 'varchar',
-    nullable: false,
-  })
-  user: User;
+  user: string;
 
   @Column({
     type: 'varchar',

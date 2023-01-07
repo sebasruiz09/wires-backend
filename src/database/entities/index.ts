@@ -1,2 +1,2 @@
-export * from './post.entity';
+export * from './message.entity';
 export * from './user.entity';

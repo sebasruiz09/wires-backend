@@ -9,31 +9,31 @@ import {
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreatePostDto } from './dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { Post as PostEntity } from 'src/database';
+import { Message as PostEntity } from 'src/database';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
+  create(@Body() createPostDto: CreatePostDto): Promise<PostEntity> {
     return this.messagesService.create(createPostDto);
   }
 
-  @Get()
+  @Get('all')
   findAll(): Promise<PostEntity[]> {
     return this.messagesService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.messagesService.findOne(+id);
+    return this.messagesService.findOne(id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.messagesService.remove(+id);
+    return this.messagesService.remove(id);
   }
 }

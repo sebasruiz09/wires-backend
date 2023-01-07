@@ -1,1 +1,1 @@
-export * from './auth.payload.interface';
+export * from './payload.interface';

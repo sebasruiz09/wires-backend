@@ -1,3 +1,4 @@
+import { Message } from './message.entity';
 import {
   Entity,
   Column,
@@ -5,6 +6,7 @@ import {
   UpdateDateColumn,
   BaseEntity,
   PrimaryColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -53,4 +55,7 @@ export class User extends BaseEntity {
     name: 'updated_at',
   })
   updatedAt: Date;
+
+  @OneToMany(() => Message, (Message) => Message.user)
+  messages: Message[];
 }

@@ -8,8 +8,8 @@ export class CreateMessageDto {
 
   @IsString()
   @Length(0, 300)
-  content: string;
+  text: string;
 
   @IsString()
-  userId: string;
+  user: string;
 }

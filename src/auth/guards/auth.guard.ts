@@ -22,7 +22,10 @@ export class AuthGuard implements CanActivate {
 
     const { userId } = decodedToken;
 
-    req.body.userId = userId;
+    const response = await this.authService.validateByUserId(userId);
+    if (!response) return false;
+
+    req.body.user = userId;
     return true;
   }
 }
