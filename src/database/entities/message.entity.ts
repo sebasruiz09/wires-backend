@@ -3,25 +3,24 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  BaseEntity,
   PrimaryGeneratedColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '.';
 
 @Entity({ name: 'message' })
-export class Message extends BaseEntity {
+export class Message {
   @PrimaryGeneratedColumn({
     type: 'bigint',
   })
   id: number;
 
   @ManyToOne(() => User, (user) => user.id, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
     eager: true,
   })
-  user: string;
+  @JoinColumn({ name: 'user_id' })
+  user: string | User;
 
   @Column({
     type: 'varchar',

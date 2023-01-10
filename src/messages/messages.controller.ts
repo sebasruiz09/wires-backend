@@ -8,9 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { CreatePostDto } from './dto';
-import { Message as PostEntity } from 'src/database';
+import { Message } from 'src/database';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { FindMessageDto } from './dto/findMessage.dto';
+import { CreateMessageDto } from './dto/createMessage.dto';
 
 @UseGuards(AuthGuard)
 @Controller('messages')
@@ -18,18 +19,30 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto): Promise<PostEntity> {
+  create(@Body() createPostDto: CreateMessageDto): Promise<Message> {
     return this.messagesService.create(createPostDto);
   }
 
-  @Get('all')
-  findAll(): Promise<PostEntity[]> {
+  @Get()
+  findAll(): Promise<Message[]> {
+    console.log('fnd');
     return this.messagesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messagesService.findOne(id);
+  @Get('me/:id')
+  findOne(@Param('id') id: string): Promise<Message> {
+    return this.messagesService.findOne(+id);
+  }
+
+  @Get('me')
+  findOwnerMessages(@Body() findMessage: any): Promise<Message[]> {
+    console.log(findMessage);
+    return this.messagesService.findOwnerAll(findMessage);
+  }
+
+  @Get('find')
+  findFilterMessages(@Body() findMessage: FindMessageDto): Promise<Message[]> {
+    return this.messagesService.findFilterMessage(findMessage);
   }
 
   @Delete(':id')

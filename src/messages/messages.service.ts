@@ -3,10 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreatePostDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from '../database/entities/message.entity';
+import { CreateMessageDto } from './dto/createMessage.dto';
+import { FindMessageDto } from './dto/findMessage.dto';
 
 @Injectable()
 export class MessagesService {
@@ -15,7 +16,7 @@ export class MessagesService {
     private readonly messageRepository: Repository<Message>,
   ) {}
 
-  async create(createPost: CreatePostDto) {
+  async create(createPost: CreateMessageDto) {
     const post = this.messageRepository.create({
       ...createPost,
     });
@@ -26,28 +27,27 @@ export class MessagesService {
     }
   }
 
-  async findOne(id: string) {
-    console.log(id);
+  async findOne(id: number): Promise<Message> {
     const post = await this.messageRepository.findOne({
-      where: { user: id },
-      relations: ['user'],
+      where: { id: id },
       select: ['id', 'title', 'text', 'createdAt', 'updatedAt', 'user'],
     });
-
     if (!post) throw new NotFoundException('Message not found');
-
-    return {
-      post,
-      message: 'Message found successfully',
-    };
+    return post;
   }
 
-  async findOwnerAll(id: string): Promise<Message[]> {
-    return await this.messageRepository.find({
-      where: {
-        user: id,
-      },
-    });
+  async findOwnerAll(find: any): Promise<Message[]> {
+    try {
+      return await this.messageRepository.find({
+        where: {
+          user: {
+            id: find.user,
+          },
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException(`${error.driverError}`);
+    }
   }
 
   async findAll(): Promise<Message[]> {
@@ -55,9 +55,14 @@ export class MessagesService {
   }
 
   async remove(id: string) {
-    const { post } = await this.findOne(id);
+    const response = await this.findOne(+id);
 
-    if (!post) throw new NotFoundException('Message not found');
+    if (!response) throw new NotFoundException('Message not found');
     return await this.messageRepository.delete(id);
+  }
+
+  async findFilterMessage<T>(findMessage: FindMessageDto): Promise<T> {
+    console.log(findMessage);
+    return null;
   }
 }

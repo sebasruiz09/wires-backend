@@ -51,8 +51,14 @@ export class AuthService {
     return await this.userRepository.findOneBy({ id: userId });
   }
 
-  async validateJwt(token: string): Promise<any> {
-    return await this.jwtService.verify(token);
+  async validateJwt(
+    token: string,
+  ): Promise<IPayload & { iat: number; exp: number }> {
+    try {
+      return await this.jwtService.verify(token);
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
   }
 
   async createJwt(user: User): Promise<IResponse> {
