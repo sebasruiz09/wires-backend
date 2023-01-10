@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Message } from '../database/entities/message.entity';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { FindMessageDto } from './dto/findMessage.dto';
@@ -61,8 +61,20 @@ export class MessagesService {
     return await this.messageRepository.delete(id);
   }
 
-  async findFilterMessage<T>(findMessage: FindMessageDto): Promise<T> {
-    console.log(findMessage);
-    return null;
+  async findFilterMessage(findMessage: FindMessageDto): Promise<Message[]> {
+    const { date, search } = findMessage;
+    const res = await this.messageRepository.find({
+      where: [
+        {
+          title: ILike(`%${search}%`),
+        },
+        {
+          createdAt: date,
+        },
+      ],
+    });
+
+    if (!res.length) throw new NotFoundException();
+    return res;
   }
 }
