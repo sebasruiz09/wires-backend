@@ -248,3 +248,35 @@ return raws affected for sql query
     "affected": 1
 }
 ```
+
+
+# Comment message
+
+PATCH wires/messages/comment/${message_id}
+
+Params : id - this is a message id
+Body:
+    - comment : string
+
+return message with comments
+
+```bash
+{
+    "id": "2",
+    "title": "tes2t1",
+    "text": "this is a messages",
+    "comments": [
+        "{\"comment\":\"this is a comment\",\"user\":\"e207fee6-7542-4311-8646-d12e1fde3baa\"}"
+    ],
+    "createdAt": "2023-01-10",
+    "updatedAt": "2023-01-10T16:49:49.724Z",
+    "user": {
+        "id": "5c91874d-e8f2-4119-9a80-8e3d8f23dfee",
+        "username": "example",
+        "email": "example@gmail.com",
+        "fullname": "exam example",
+        "createdAt": "2023-01-10T17:32:45.687Z",
+        "updatedAt": "2023-01-10T17:32:45.687Z"
+    }
+}
+```

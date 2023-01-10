@@ -8,6 +8,8 @@ import { ILike, Repository } from 'typeorm';
 import { Message } from '../database/entities/message.entity';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { FindMessageDto } from './dto/findMessage.dto';
+import { commentDto } from './dto/comment.dto';
+import { equals } from 'class-validator';
 
 @Injectable()
 export class MessagesService {
@@ -30,8 +32,21 @@ export class MessagesService {
   async findOne(id: number): Promise<Message> {
     const post = await this.messageRepository.findOne({
       where: { id: id },
-      select: ['id', 'title', 'text', 'createdAt', 'updatedAt', 'user'],
+      select: [
+        'id',
+        'title',
+        'text',
+        'createdAt',
+        'updatedAt',
+        'user',
+        'comments',
+      ],
+      relations: {
+        user: true,
+      },
     });
+    delete post.user.password;
+
     if (!post) throw new NotFoundException('Message not found');
     return post;
   }
@@ -84,5 +99,16 @@ export class MessagesService {
 
     if (!res.length) throw new NotFoundException();
     return res;
+  }
+
+  async createComment(id: number, comment: commentDto): Promise<Message> {
+    const { comments, ...result } = await this.findOne(id);
+    if (equals(result.user.id, comment.user))
+      throw new BadRequestException('you cannot comment on your messages');
+    await this.messageRepository.save({
+      ...result,
+      comments: [...comments, comment],
+    });
+    return await this.findOne(id);
   }
 }

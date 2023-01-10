@@ -33,6 +33,13 @@ export class Message {
   })
   text: string;
 
+  @Column({
+    array: true,
+    default: [],
+    type: 'text',
+  })
+  comments: { id: string; comment: string }[];
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'date',
