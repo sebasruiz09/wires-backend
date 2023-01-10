@@ -50,8 +50,16 @@ export class MessagesService {
     }
   }
 
-  async findAll(): Promise<Message[]> {
-    return await this.messageRepository.find({});
+  async findAll(): Promise<any> {
+    const response = await this.messageRepository.find({
+      relations: {
+        user: true,
+      },
+    });
+    response.map((message) => {
+      delete message.user.password;
+    });
+    return response;
   }
 
   async remove(id: string) {

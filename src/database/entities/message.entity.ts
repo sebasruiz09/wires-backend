@@ -16,11 +16,9 @@ export class Message {
   })
   id: number;
 
-  @ManyToOne(() => User, (user) => user.id, {
-    eager: true,
-  })
+  @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  user: string | User;
+  user: any;
 
   @Column({
     type: 'varchar',

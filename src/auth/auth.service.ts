@@ -94,7 +94,6 @@ export class AuthService {
         const response = await this.userRepository.save(newUser);
         return this.genResponse(response);
       } catch (error) {
-        console.log(error);
         throw new BadRequestException(`${error.driverError.detail}`);
       }
     }

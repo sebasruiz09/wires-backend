@@ -25,7 +25,6 @@ export class MessagesController {
 
   @Get()
   findAll(): Promise<Message[]> {
-    console.log('fnd');
     return this.messagesService.findAll();
   }
 
@@ -36,7 +35,6 @@ export class MessagesController {
 
   @Get('me')
   findOwnerMessages(@Body() findMessage: any): Promise<Message[]> {
-    console.log(findMessage);
     return this.messagesService.findOwnerAll(findMessage);
   }
 
